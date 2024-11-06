@@ -22,11 +22,11 @@ export class AuthService {
     return hashPassword;
   }
 
-  private comparePasswords(
-    password: string,
+  private async comparePasswords(
     newPassword: string,
+    password: string,
   ): Promise<boolean> {
-    const isValidPassword = bcryptjs.compare(newPassword, password);
+    const isValidPassword = await bcryptjs.compare(newPassword, password);
     if (!isValidPassword) throw new UnauthorizedException('password is wrong');
 
     return isValidPassword;
@@ -51,12 +51,14 @@ export class AuthService {
     );
     if (!userFound) throw new NotFoundException('Email not found');
 
-    this.comparePasswords(loginDto.password, userFound.password);
+    await this.comparePasswords(loginDto.password, userFound.password);
 
     return await this.createToken(userFound.id, loginDto.email);
   }
 
   async signUp(signUpDto: SignUpDto) {
+    console.log(signUpDto.password);
+    
     await this.verifyIfUserAlreadyExist(signUpDto.email);
     const hashpassword = await this.encryptPassword(signUpDto.password);
 

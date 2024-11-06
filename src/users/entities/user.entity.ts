@@ -18,11 +18,11 @@ export class User {
     @Column({ nullable: true })
     secondName?: string;
 
-    @Column()
-    lastName: string;
+    @Column({ nullable: true })
+    lastName?: string;
 
-    @Column()
-    phone: string;
+    @Column({ nullable: true })
+    phone?: string;
 
     @Column({ nullable: true })
     secondPhone?: string;

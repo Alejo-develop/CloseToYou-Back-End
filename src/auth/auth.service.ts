@@ -38,8 +38,10 @@ export class AuthService {
     if (userFound) throw new ConflictException('User already exist');
   }
 
-  private async createToken(id: string, email: string) {
-    const payload = { id, email };
+  private async createToken(id: string) {
+    const payload = { id: id };
+    console.log(payload);
+    
     const token = await this.jwtServices.signAsync(payload);
 
     return token;
@@ -49,16 +51,16 @@ export class AuthService {
     const userFound = await this.userServices.findUserByEmailWithPassword(
       loginDto.email,
     );
+    console.log('user' , userFound);
+    
     if (!userFound) throw new NotFoundException('Email not found');
 
     await this.comparePasswords(loginDto.password, userFound.password);
 
-    return await this.createToken(userFound.id, loginDto.email);
+    return await this.createToken(userFound.id);
   }
 
   async signUp(signUpDto: SignUpDto) {
-    console.log(signUpDto.password);
-    
     await this.verifyIfUserAlreadyExist(signUpDto.email);
     const hashpassword = await this.encryptPassword(signUpDto.password);
 

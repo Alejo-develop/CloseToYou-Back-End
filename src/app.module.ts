@@ -4,6 +4,7 @@ import { ContactsModule } from './contacts/contacts.module';
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
+import { CloudinaryModule } from './common/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -24,7 +25,7 @@ import { AuthModule } from './auth/auth.module';
       }),
       inject: [ConfigService]
     }),
-    UsersModule, ContactsModule, AuthModule],
+    UsersModule, ContactsModule, AuthModule, CloudinaryModule],
   controllers: [],
   providers: [],
 })

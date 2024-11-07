@@ -5,11 +5,13 @@ import { Repository } from 'typeorm';
 import { SignUpDto } from 'src/auth/dto/signUp.dto';
 import { UpdateUserDto } from 'src/auth/dto/updateUser.dto';
 import { ActiveUserInterface } from 'src/common/interface/activeUser.interface';
+import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>
+    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly cloudinaryService: CloudinaryService
   ){}
 
   private validateOwnerShip(userId: string, user: ActiveUserInterface){
@@ -39,16 +41,26 @@ export class UsersService {
       where: {email: email},
       select: [
         'email',
-        'password'
+        'password',
+        'id'
       ]
     })
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto, activeUser: ActiveUserInterface){
-    const user = await this.findOneById(id)
+  async updateUser(id: string, updateUserDto: UpdateUserDto, activeUser: ActiveUserInterface,  file?: Express.Multer.File){
+    await this.findOneById(id)
     this.validateOwnerShip(id, activeUser)
-    this.userRepository.merge(user, updateUserDto)
-    return await this.userRepository.save(user)
+
+    if (file) {
+      const uploadResult = await this.cloudinaryService.uploadFile(file);
+      updateUserDto.img = uploadResult.secure_url;
+    }
+
+    const updateResult = await this.userRepository.update(id, {
+      ...updateUserDto,
+    });
+
+    return updateResult;
   }
 
   async removeUser(id: string, activeUser: ActiveUserInterface){

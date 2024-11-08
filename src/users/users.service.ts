@@ -29,8 +29,9 @@ export class UsersService {
   }
 
   async findOneById(id: string){
-    const userFound = await this.userRepository.findOne({where: {id}})
-
+    const userFound = await this.userRepository.findOne({where: {id: id}})
+    console.log(userFound);
+    
     if(!userFound) throw new NotFoundException('User by id not found')
 
     return userFound
@@ -48,19 +49,16 @@ export class UsersService {
   }
 
   async updateUser(id: string, updateUserDto: UpdateUserDto, activeUser: ActiveUserInterface,  file?: Express.Multer.File){
-    await this.findOneById(id)
+    const userFound = await this.findOneById(id)
     this.validateOwnerShip(id, activeUser)
 
+    
     if (file) {
       const uploadResult = await this.cloudinaryService.uploadFile(file);
       updateUserDto.img = uploadResult.secure_url;
     }
 
-    const updateResult = await this.userRepository.update(id, {
-      ...updateUserDto,
-    });
-
-    return updateResult;
+    return await this.userRepository.save({...userFound, ...updateUserDto})
   }
 
   async removeUser(id: string, activeUser: ActiveUserInterface){

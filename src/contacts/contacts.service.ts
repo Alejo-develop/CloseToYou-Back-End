@@ -34,6 +34,7 @@ export class ContactsService {
     const contact = await this.contactRepository.findOne({where: {id: id}});
 
     this.validateOwnerShip(contact.userId, user)
+
     return contact
   }
 

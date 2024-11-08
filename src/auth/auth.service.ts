@@ -40,8 +40,6 @@ export class AuthService {
 
   private async createToken(id: string) {
     const payload = { id: id };
-    console.log(payload);
-    
     const token = await this.jwtServices.signAsync(payload);
 
     return token;
@@ -51,13 +49,16 @@ export class AuthService {
     const userFound = await this.userServices.findUserByEmailWithPassword(
       loginDto.email,
     );
-    console.log('user' , userFound);
     
     if (!userFound) throw new NotFoundException('Email not found');
 
     await this.comparePasswords(loginDto.password, userFound.password);
+    const token = await this.createToken(userFound.id);
 
-    return await this.createToken(userFound.id);
+    return {
+      id: userFound.id,
+      token
+    }
   }
 
   async signUp(signUpDto: SignUpDto) {

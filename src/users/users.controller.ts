@@ -36,6 +36,8 @@ export class UsersController {
     @ActiveUser() user: ActiveUserInterface,
     @UploadedFile() file: Express.Multer.File,
   ) {
+    
+    
     return await this.usersService.updateUser(id, updateUserDto, user, file);
   }
 

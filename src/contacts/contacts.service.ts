@@ -5,13 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Contact } from './entities/contact.entity';
 import { Repository } from 'typeorm';
 import { ActiveUserInterface } from 'src/common/interface/activeUser.interface';
-import { User } from 'src/users/entities/user.entity';
+import { CloudinaryService } from 'src/common/cloudinary/cloudinary.service';
 
 @Injectable()
 export class ContactsService {
   constructor(
     @InjectRepository(Contact)
     private readonly contactRepository: Repository<Contact>,
+    private readonly cloudinaryService: CloudinaryService
   ) {}
 
   private validateOwnerShip(userId: string, user: ActiveUserInterface) {
@@ -20,8 +21,12 @@ export class ContactsService {
     }
   }
 
-  async create(createContactDto: CreateContactDto, user: ActiveUserInterface) {
+  async create(createContactDto: CreateContactDto, user: ActiveUserInterface,  file?: Express.Multer.File) {
     this.validateOwnerShip(createContactDto.userId, user)
+    if (file) {
+      const uploadResult = await this.cloudinaryService.uploadFile(file);
+      createContactDto.img = uploadResult.secure_url;
+    }
 
     return await this.contactRepository.save(createContactDto);
   }
@@ -38,11 +43,16 @@ export class ContactsService {
     return contact
   }
 
-  async update(id: string, updateContactDto: UpdateContactDto, user: ActiveUserInterface) {
+  async update(id: string, updateContactDto: UpdateContactDto, user: ActiveUserInterface, file?: Express.Multer.File) {
     const contact = await this.findOneWithUserId(id, user)
+    
+    if (file) {
+      const uploadResult = await this.cloudinaryService.uploadFile(file);
+      updateContactDto.img = uploadResult.secure_url;
+    }
     this.contactRepository.merge(contact, updateContactDto)
-
-    return await this.contactRepository.save(updateContactDto)
+    
+    return await this.contactRepository.save(contact)
   }
 
   async remove(id: string, user: ActiveUserInterface) {

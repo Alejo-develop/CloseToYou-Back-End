@@ -1,9 +1,11 @@
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, Validate } from 'class-validator';
+import { IsStringOrNumber } from './validate.dto';
 
 export class CreateContactDto {
   @IsString()
   name: string;
   
+  @IsOptional()
   @IsString()
   userId: string
 
@@ -17,18 +19,29 @@ export class CreateContactDto {
 
   @IsOptional()
   @IsString()
+  role?: string;
+
+  @IsOptional()
+  @IsString()
   phone?: string;
 
   @IsOptional()
   @IsString()
-  seconPhone?: string;
+  secondPhone?: string;
 
   @IsOptional()
   @IsString()
-  address?: string;
+  email?: string;
+
+  @Validate(IsStringOrNumber)
+  @IsOptional()
+  latitude?: string | number;;
+
+  @Validate(IsStringOrNumber)
+  @IsOptional()
+  longitude?: string | number;;
 
   @IsOptional()
-  @IsString()
   img?: string;
 }
 

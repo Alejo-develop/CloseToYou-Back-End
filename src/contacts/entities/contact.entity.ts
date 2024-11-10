@@ -14,13 +14,19 @@ export class Contact {
     user: User
 
     @Column({ nullable: false })
-    userId: string;
+    userId?: string;
 
     @Column()
     name: string;
 
+    @Column({ nullable: true})
+    email?: string;
+
     @Column({ nullable: true })
     secondName?: string;
+
+    @Column({ nullable: true })
+    role?: string;
 
     @Column({ nullable: true })
     lastName?: string;
@@ -32,17 +38,14 @@ export class Contact {
     secondPhone?: string;
 
     @Column({ nullable: true})
-    address?: string;
-
-    @Column({ nullable: true})
     img?: string
 
-    @Column({ nullable: true, type: 'json' })
-    location?: {
-      latitude: number;
-      longitude: number;
-    };
+    @Column({ nullable: true, type: 'float' })
+    latitude?: number | string;
 
+    @Column({ nullable: true, type: 'float' })
+    longitude?: number | string;
+      
     @CreateDateColumn({ select: false })
     createdAt: Date;
   
